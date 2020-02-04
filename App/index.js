@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, StatusBar, SafeAreaView } from 'react-native';
 // My components
 import Row from './components/Row';
 import Button from './components/Button';
+import calculator, { initialState } from './util/calculator';
 
 const styles = StyleSheet.create({
 	container: {
@@ -20,66 +21,11 @@ const styles = StyleSheet.create({
 });
 
 export default class App extends React.Component {
-	state = {
-		currentValue: '0',
-		operator: null,
-		previousValue: null
-	};
+	state = initialState;
 
 	handleTap = (type, value) => {
 		this.setState(state => {
-			if (state.currentValue === '0') {
-				return { currentValue: `${value}` }; // This funtion ends after this call sense it is the return
-			}
-			if (type === 'number') {
-				return {
-					currentValue: `${state.currentValue}${value}`
-				};
-			}
-			if (type === 'operator') {
-				return {
-					operator: value,
-					previousValue: state.currentValue,
-					currentValue: '0'
-				};
-			}
-			if (type === 'equal') {
-				const { currentValue, previousValue, operator } = state; // Object destructing
-				const current = parseFloat(currentValue);
-				const previous = parseFloat(previousValue);
-
-				const resetState = {
-					operator: null,
-					previousValue: null
-				};
-
-				if (operator === '/') {
-					return {
-						currentValue: previous / current,
-						...resetState
-					};
-				}
-				if (operator === '*') {
-					return {
-						currentValue: previous * current,
-						...resetState
-					};
-				}
-				if (operator === '-') {
-					return {
-						currentValue: previous - current,
-						...resetState
-					};
-				}
-				if (operator === '+') {
-					return {
-						currentValue: previous + current,
-						...resetState
-					};
-				}
-				return state;
-			}
-			return state;
+			calculator(type, value, state);
 		});
 	};
 
@@ -90,9 +36,9 @@ export default class App extends React.Component {
 				<SafeAreaView>
 					<Text style={styles.value}>{parseFloat(this.state.currentValue).toLocaleString()}</Text>
 					<Row>
-						<Button text='C' theme='secondary' onPress={() => alert('TODO')} />
-						<Button text='+/-' theme='secondary' onPress={() => alert('TODO')} />
-						<Button text='%' theme='secondary' onPress={() => alert('TODO')} />
+						<Button text='C' theme='secondary' onPress={() => this.handleTap('clear')} />
+						<Button text='+/-' theme='secondary' onPress={() => this.handleTap('posneg')} />
+						<Button text='%' theme='secondary' onPress={() => this.handleTap('percentage')} />
 						<Button text='/' theme='accent' onPress={() => this.handleTap('operator', '/')} />
 					</Row>
 					<Row>
